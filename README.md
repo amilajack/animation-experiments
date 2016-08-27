@@ -3,7 +3,7 @@ animation-experiments
 
 A collection of animation experiments
 
-**Note: Requires browser with ES6 support**
+**Note: Requires browser with ES6 support and the Fetch API**
 
 ## Installation
 ```bash
