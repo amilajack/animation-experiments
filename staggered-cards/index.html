@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Staggered Cards Animation</title>
+  </head>
+  <body>
+    <button type="button" onclick="init(1)" name="button">Page 1</button>
+    <button type="button" onclick="init(2)" name="button">Page 2</button>
+    <button type="button" onclick="init(3)" name="button">Page 3</button>
+
+    <h1>Staggered Cards Animation</h1>
+    <h5>Inspired by <a target="_blank" href="https://devart.withgoogle.com/#/">DevArt with Google</a></h5>
+
+    <div class="list">
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+      <div class="container"><div class="elem hide-elem"></div></div>
+    </div>
+  </body>
+
+  <style media="screen">
+    .elem {
+      background: gray;
+      height: 90%;
+      width: 90%;
+      background-position: center;
+      background-color: gray;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    .container {
+      height: 200px;
+      width: 25%;
+      overflow: hidden;
+      float: left;
+      display: inline-block;
+    }
+
+    .hide-elem {
+      transform: translate3d(0, -110%, 0);
+    }
+  </style>
+
+  <script type="text/javascript" src="../node_modules/jquery/dist/jquery.slim.min.js"></script>
+  <script type="text/javascript">
+    function getResults(page = 1) {
+      return fetch(
+        `https://unsplash.com/napi/photos/curated?page=${page}&per_page=50&order_by=latest&client_id=d69927c7ea5c770fa2ce9a2f1e3589bd896454f7068f689d8e41a25b54fa6042`
+      )
+      .then(res => res.json());
+    }
+
+    function init(page) {
+      $('.elem').each(function(index) {
+        const time = index * 100;
+
+        $(this)
+          .addClass('hide-elem')
+          .css({
+            transition: `all 1.2s cubic-bezier(0.77,0,0.175,1)`
+          });
+      });
+
+      setTimeout(function () {
+        getResults(page).then(res => {
+          $('.elem').each(function(index) {
+            $(this).css({
+              'background-image': `url('${res[index].urls.regular}')`
+            });
+          });
+
+          setTimeout(() => {
+            $('.elem')
+              .removeClass('hide-elem')
+              .each(function (index) {
+                const time = index * 100;
+                $(this).css({
+                  transition: `all 1.2s cubic-bezier(0.77,0,0.175,1) ${time}ms`
+                });
+              });
+          }, 500);
+        });
+      }, 2000);
+    }
+
+    init(1);
+  </script>
+</html>
