@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Staggered Cards Animation</title>
+  </head>
+  <body>
+    <h1>Staggered Cards Animation</h1>
+    <h5>Inspired by <a target="_blank" href="https://devart.withgoogle.com/#/">DevArt with Google</a></h5>
+
+    <section>
+      <button type="button" onclick="init(1)" name="button">Page 1</button>
+      <button type="button" onclick="init(2)" name="button">Page 2</button>
+      <button type="button" onclick="init(3)" name="button">Page 3</button>
+    </section>
+
+    <section>
+      <div class="list">
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+        <div class="container"><div class="elem"></div></div>
+      </div>
+    </section>
+  </body>
+
+  <style media="screen">
+    .elem {
+      background: gray;
+      height: 90%;
+      width: 90%;
+      will-change: transform;
+      background-position: center;
+      background-color: gray;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    .container {
+      height: 200px;
+      width: 25%;
+      overflow: hidden;
+      float: left;
+      display: inline-block;
+    }
+
+    .hide-elem.elem {
+      transform: translate3d(0, -110%, 0);
+    }
+  </style>
+
+  <script type="text/javascript" src="../node_modules/jquery/dist/jquery.slim.min.js"></script>
+  <script type="text/javascript">
+
+    const staggerDelay = 100;
+    const easing = 'cubic-bezier(0.77, 0, 0.175, 1)';
+    const duration = 1200;
+
+
+    function getResults(page = 1) {
+      return fetch(
+        `https://unsplash.com/napi/photos/random?page=${page}&per_page=50&order_by=latest&client_id=d69927c7ea5c770fa2ce9a2f1e3589bd896454f7068f689d8e41a25b54fa6042`
+      )
+      .then(res => res.json());
+    }
+
+    function init(page) {
+
+      const HideElements = new Promise((resolve, reject) => {
+        // $('.elem').each(function(index) {
+        //   $(this)
+        //     .addClass('hide-elem')
+        //     .css({
+        //       transition: `all ${duration}ms ${animation}`
+        //     });
+        // });
+
+        for (const element of document.querySelectorAll('.elem')) {
+          element.animate({
+            // opacity: [1, 0],
+            transform: ['translate3d(0, 0, 0)', 'translate3d(0, -110%, 0)']
+          }, {
+            duration,
+            easing
+          });
+        }
+
+        setTimeout(() => {
+          resolve(true);
+        }, duration);
+      });
+
+      HideElements
+        .then(() => getResults(page))
+        .then(res => {
+          return getResults(page).then(res => (
+            new Promise(function(resolve, reject) {
+              const totalAnimationTime = (($('.elem').length - 1)
+                                          * staggerDelay)
+                                          + duration;
+
+              setTimeout(() => {
+                resolve(true)
+              }, totalAnimationTime);
+
+              $('.elem').each(function(index) {
+                $(this).css({
+                  'background-image': `url('${res[index].urls.regular}')`
+                });
+              });
+
+              // $('.elem')
+              //   .removeClass('hide-elem')
+              //   .each(function(index) {
+              //     const time = index * staggerDelay;
+              //     $(this).css({
+              //       transition: `all ${duration}ms ${animation} ${time}ms`
+              //     });
+              //   });
+
+              document.querySelectorAll('.elem').forEach((element, index) => {
+                const delay = index * staggerDelay;
+
+                element.animate({
+                  // opacity: [0, 1],
+                  transform: ['translate3d(0, -110%, 0)', 'translate3d(0, 0, 0)']
+                }, {
+                  duration,
+                  easing,
+                  delay
+                });
+              });
+            })
+          ));
+        })
+        .then(() => {
+          console.log('DONE');
+        });
+    }
+
+    init(1);
+  </script>
+</html>
